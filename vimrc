@@ -1,3 +1,5 @@
+" do not load defaults if ~/.vimrc is missing
+"let skip_defaults_vim=1
 let mapleader = " "
 nnoremap <Leader>w :w<CR> " Save file
 nnoremap <Leader>q :q<CR> " Quit Vim
@@ -52,12 +54,10 @@ set expandtab       " Use spaces instead of tabs
 set hlsearch
 set incsearch
 
-colorscheme desert
+" colorscheme desert
 
 " Set a reasonable timeout for key mappings
 set timeoutlen=500
-
-" Optional: Set a specific color scheme (choose one you prefer)
 
 set termguicolors     " enable true colors support
 
