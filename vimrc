@@ -41,7 +41,7 @@ set linebreak
 set breakindent
 
 " Use system clipboard for yank and paste
-set clipboard=unnamed
+set clipboard=unnamedplus
 
 " Enable highlighting of the current line
 set cursorline
