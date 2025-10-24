@@ -43,9 +43,6 @@ set breakindent
 " Use system clipboard for yank and paste
 set clipboard=unnamedplus
 
-" Enable highlighting of the current line
-set cursorline
-
 " Set the default indentation for markdown files
 set tabstop=2       " Number of spaces that a <Tab> counts for
 set shiftwidth=2    " Number of spaces to use for each step of (auto)indent
@@ -63,3 +60,39 @@ set timeoutlen=500
 " Optional: Set a specific color scheme (choose one you prefer)
 
 set termguicolors     " enable true colors support
+
+" Yank highlight functionality
+if has('textprop') && has('timers')
+  " Define the text property type for yanked text
+  silent! call prop_type_delete('yank_prop')
+  call prop_type_add('yank_prop', {
+    \ 'highlight': 'IncSearch',
+    \ 'combine': v:false
+  \})
+
+  function! Highlight(timeout) abort
+    if !v:event.visual && v:event.operator == 'y' && !(empty(v:event.regtype))
+      let start = getpos("'[")
+      let start_line = start[1]
+      let start_col = start[2]
+      let end_line = getpos("']")[1]
+      let shift = start_line == end_line ? start_col - 1 : 0
+      let length = len(v:event.regcontents[-1]) + 1 + shift
+      let bufnr = str2nr(expand('<abuf>'))
+
+      call prop_add(start_line, start_col, {
+        \ 'end_lnum': end_line,
+        \ 'end_col': length,
+        \ 'type': 'yank_prop'
+      \})
+
+      call timer_start(a:timeout, {-> prop_remove({'bufnr': bufnr, 'type': 'yank_prop', 'all': v:true}, start_line, end_line)})
+    endif
+  endfunction
+
+  " Set up autocommand to highlight yanked text
+  augroup YankHighlight
+    autocmd!
+    autocmd TextYankPost * call Highlight(100)
+  augroup END
+endif
